@@ -3,47 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gauss Jordan Solver</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        textarea {
-            width: 400px;
-            height: 100px;
-        }
-        input {
-            width: 40px;
-            text-align: center;
-        }
-        button {
-            margin-top: 10px;
-            padding: 5px;
-            cursor: pointer;
-        }
-        #output {
-            margin-top: 20px;
-            white-space: pre;
-        }
-    </style>
+    <title>Gauss Jordan Calculator</title>
 </head>
 <body>
-    <h2>Gauss Jordan Solver</h2>
+    <h1>Gauss Jordan Calculator</h1>
 
-    <label for="rowsInput">Enter number of rows:</label>
-    <input type="number" id="rowsInput" min="1" value="3">
+    <label for="rows">Jumlah Baris:</label>
+    <input type="number" id="rows" min="1" placeholder="Jumlah Baris">
 
-    <label for="colsInput">Enter number of columns:</label>
-    <input type="number" id="colsInput" min="1" value="3">
+    <label for="cols">Jumlah Kolom:</label>
+    <input type="number" id="cols" min="1" placeholder="Jumlah Kolom">
 
-    <div id="matrixInputs"></div>
-
-    <button onclick="generateMatrix()">Generate Matrix</button>
+    <button onclick="createMatrix()">Buat Matriks</button>
     <button onclick="solveGaussJordan()">Solve</button>
 
-    <h3>Output:</h3>
-    <div id="output"></div>
+    <div id="matrix-container"></div>
+    <div id="steps-container"></div>
 
     <script src="gaussjordan.js"></script>
 </body>
