@@ -1,171 +1,70 @@
-class Fraction {
-    constructor(frac) {
-        this.num = parseInt(frac.split("/")[0]);
-        this.den = frac.includes("/") ? parseInt(frac.split("/")[1]) : 1;
-        this.reduce();
-    }
+function createMatrix() {
+    const rows = parseInt(document.getElementById("rows").value);
+    const cols = parseInt(document.getElementById("cols").value);
 
-    reduce() {
-        const commonDivisor = this.gcd(this.den, this.num);
-        this.den = this.den / commonDivisor;
-        this.num = this.num / commonDivisor;
-        if (this.den < 0) {
-            this.den *= -1;
-            this.num *= -1;
-        }
-    }
-
-    gcd(a, b) {
-        a = Math.abs(a);
-        b = Math.abs(b);
-        while (b > 0) {
-            const c = a % b;
-            a = b;
-            b = c;
-        }
-        return a;
-    }
-
-    add(other) {
-        const res = new Fraction("1");
-        const lcm = (this.den * other.den) / this.gcd(this.den, other.den);
-        res.den = lcm;
-        res.num = (this.num * (lcm / this.den)) + (other.num * (lcm / other.den));
-        res.reduce();
-        return res;
-    }
-
-    subtract(other) {
-        const res = new Fraction("1");
-        const lcm = (this.den * other.den) / this.gcd(this.den, other.den);
-        res.den = lcm;
-        res.num = (this.num * (lcm / this.den)) - (other.num * (lcm / other.den));
-        res.reduce();
-        return res;
-    }
-
-    multiply(other) {
-        const res = new Fraction("1");
-        res.den = this.den * other.den;
-        res.num = this.num * other.num;
-        res.reduce();
-        return res;
-    }
-
-    divide(other) {
-        const res = new Fraction("1");
-        res.den = this.den * other.num;
-        res.num = this.num * other.den;
-        res.reduce();
-        return res;
-    }
-
-    toString() {
-        if (this.den !== 1) {
-            return `${this.num}/${this.den}`;
-        } else {
-            return `${this.num}`;
-        }
-    }
-
-    abs() {
-        const res = new Fraction("1");
-        res.num = Math.abs(this.num);
-        res.den = this.den;
-        return res;
-    }
-
-    static fromInput(inputId) {
-        return new Fraction(document.getElementById(inputId).value);
-    }
-}
-
-function generateMatrix() {
-    const rows = parseInt(document.getElementById("rowsInput").value);
-    const cols = parseInt(document.getElementById("colsInput").value);
-
-    const matrixInputs = document.getElementById("matrixInputs");
-    matrixInputs.innerHTML = "";
-
+    let matrixHTML = "<table>";
     for (let i = 0; i < rows; i++) {
+        matrixHTML += "<tr>";
         for (let j = 0; j < cols; j++) {
-            const inputId = `matrixInput_${i}_${j}`;
-            const input = document.createElement("input");
-            input.type = "text";
-            input.className = "matrixInput";
-            input.id = inputId;
-            matrixInputs.appendChild(input);
-
-            if (j < cols - 1) {
-                const space = document.createTextNode(" ");
-                matrixInputs.appendChild(space);
-            }
+            matrixHTML += `<td><input type="number" id="cell_${i}_${j}" placeholder="${i + 1},${j + 1}"></td>`;
         }
-        const lineBreak = document.createElement("br");
-        matrixInputs.appendChild(lineBreak);
+        matrixHTML += "</tr>";
     }
-}
+    matrixHTML += "</table>";
 
-function getMatrixFromInput(rows, cols) {
-    const matrix = [];
-    for (let i = 0; i < rows; i++) {
-        matrix.push([]);
-        for (let j = 0; j < cols; j++) {
-            matrix[i].push(Fraction.fromInput(`matrixInput_${i}_${j}`));
-        }
-    }
-    return matrix;
+    document.getElementById("matrix-container").innerHTML = matrixHTML;
 }
 
 function solveGaussJordan() {
-    const rows = parseInt(document.getElementById("rowsInput").value);
-    const cols = parseInt(document.getElementById("colsInput").value);
+    const rows = parseInt(document.getElementById("rows").value);
+    const cols = parseInt(document.getElementById("cols").value);
 
-    const matrix = getMatrixFromInput(rows, cols);
-
-    let outputText = "";
-
-    // Gauss
-    for (let i = 0; i < cols; i++) {
-        const pivot = matrix[0][i];
-        if (pivot.num !== 0) {
-            for (let k = 0; k < cols; k++) {
-                matrix[0][k] /= pivot;
-            }
-            break;
-        }
-    }
-
-    for (let i = 0; i < cols - 1; i++) {
-        for (let j = i + 1; j < rows; j++) {
-            if (matrix[i][i].num === 0) {
-                continue;
-            }
-            const ratio = matrix[j][i] / matrix[i][i];
-            for (let k = i; k < cols; k++) {
-                matrix[j][k] = matrix[j][k] - ratio * matrix[i][k];
-            }
-        }
-    }
-
-    // Jordan
-    for (let i = Math.min(rows, cols) - 1; i > 0; i--) {
-        for (let j = i - 1; j >= 0; j--) {
-            const ratio = matrix[j][i];
-            for (let k = cols - 1; k >= i; k--) {
-                matrix[j][k] = matrix[j][k] - ratio * matrix[i][k];
-            }
-        }
-    }
-
-    // Output
-    outputText += "Result:\n";
+    // Mendapatkan nilai dari matriks
+    let matrix = [];
     for (let i = 0; i < rows; i++) {
+        matrix[i] = [];
         for (let j = 0; j < cols; j++) {
-            outputText += matrix[i][j].toString() + ' ';
+            matrix[i][j] = parseFloat(document.getElementById(`cell_${i}_${j}`).value) || 0;
         }
-        outputText += '\n';
     }
 
-    document.getElementById("output").textContent = outputText;
+    // Menyelesaikan matriks menggunakan metode Gauss-Jordan
+    const steps = gaussJordan(matrix);
+
+    // Menampilkan langkah-langkah penyelesaian
+    displaySteps(steps);
+}
+
+function gaussJordan(matrix) {
+    // Implementasi metode Gauss-Jordan di sini
+    // ...
+
+    // Contoh langkah-langkah:
+    const steps = [];
+    steps.push(matrix.map(row => [...row])); // Langkah awal
+
+    // Contoh langkah 1: Menggunakan operasi baris elementer untuk membuat 0 di bawah elemen matriks[0][0]
+    // ...
+
+    // Contoh langkah 2: Membuat elemen matriks[1][1] menjadi 1
+    // ...
+
+    // Langkah selanjutnya sesuai dengan metode Gauss-Jordan
+
+    return steps;
+}
+
+function displaySteps(steps) {
+    const stepsContainer = document.getElementById("steps-container");
+    stepsContainer.innerHTML = "";
+
+    for (let i = 0; i < steps.length; i++) {
+        const stepTable = "<table>" +
+            steps[i].map(row => "<tr>" + row.map(cell => `<td>${cell.toFixed(2)}</td>`).join("") + "</tr>").join("") +
+            "</table>";
+
+        const stepDiv = document.createElement("div");
+        stepDiv.innerHTML = `<h3>Langkah ${i + 1}</h3>${stepTable}`;
+        stepsContainer.appendChild(stepDiv);
+    }
 }
