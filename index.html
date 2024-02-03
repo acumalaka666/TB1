@@ -3,38 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gauss Jordan Solver</title>
+    <title>Gauss-Jordan Elimination</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 20px;
         }
-        textarea {
-            width: 400px;
-            height: 100px;
+
+        code {
+            display: block;
+            white-space: pre-wrap;
         }
-        button {
-            margin-top: 10px;
-            padding: 5px;
-            cursor: pointer;
-        }
+
         #output {
             margin-top: 20px;
-            white-space: pre;
         }
     </style>
 </head>
 <body>
-    <h2>Gauss Jordan Solver</h2>
+    <h1>Gauss-Jordan Elimination</h1>
+    <code id="code">
+        import numpy as np
 
-    <label for="matrixInput">Enter the matrix (line by line):</label>
-    <textarea id="matrixInput" placeholder="Example: 1/2 3/4 5/6"></textarea>
+        // ... (Your Python code here)
+    </code>
 
-    <button onclick="solveGaussJordan()">Solve</button>
-
-    <h3>Output:</h3>
+    <button onclick="runCode()">Run Code</button>
     <div id="output"></div>
 
-    <script src="gaussjordan.js"></script>
+    <script>
+        function runCode() {
+            try {
+                const codeElement = document.getElementById('code');
+                const code = codeElement.innerText;
+
+                // Use an iframe to execute the Python code
+                const iframe = document.createElement('iframe');
+                document.body.appendChild(iframe);
+
+                const script = `
+                    const np = require('numpy');
+                    ${code}
+                    const result = gauss_jordan(coefficients, right_hand_side, verbose);
+                    document.getElementById('output').innerText = 'Result: ' + result;
+                `;
+
+                iframe.contentWindow.eval(script);
+            } catch (error) {
+                document.getElementById('output').innerText = 'Error: ' + error.message;
+            }
+        }
+    </script>
 </body>
 </html>
