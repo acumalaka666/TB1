@@ -23,32 +23,26 @@
     <pre id="result"></pre>
 
     <script>
-        function calculate() {
+        async function calculate() {
             const rows = parseInt(document.getElementById('rows').value);
             const cols = parseInt(document.getElementById('cols').value);
-            const matrixInput = document.getElementById('matrixInput').value.split('\n');
+            const matrixInput = document.getElementById('matrixInput').value.split('\n').map(row => row.split(' '));
 
-async function calculate() {
-        const rows = parseInt(document.getElementById('rows').value);
-        const cols = parseInt(document.getElementById('cols').value);
-        const matrixInput = document.getElementById('matrixInput').value.split('\n').map(row => row.split(' '));
+            // Call the Python function using fetch API
+            const response = await fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rows, cols, matrixInput }),
+            });
 
-        // Call the Python function using fetch API
-        const response = await fetch('/calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ rows, cols, matrixInput }),
-        });
-
-        if (response.ok) {
-            const result = await response.text();
-            document.getElementById('result').innerText = result;
-        } else {
-            console.error('Error:', response.status);
-        }
-    }
+            if (response.ok) {
+                const result = await response.text();
+                document.getElementById('result').innerText = result;
+            } else {
+                console.error('Error:', response.status);
+            }
         }
     </script>
 </body>
